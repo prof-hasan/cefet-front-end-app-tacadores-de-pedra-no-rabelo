@@ -33,4 +33,7 @@ naveEl.addEventListener("keypress", (e) => {
             }
             break;
     }
+
+    naveEl.style.left = x;
+    naveEl.style.top = y;
 });
