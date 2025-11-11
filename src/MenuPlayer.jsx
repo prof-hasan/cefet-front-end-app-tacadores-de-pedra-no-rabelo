@@ -42,7 +42,7 @@ function MenuPlayer() {
       </main>
 
       <aside>
-        <div>
+        <div className = "dinheiro">
           <p>Dinheiro: ${playerMoney}</p>
         </div>
       </aside>
