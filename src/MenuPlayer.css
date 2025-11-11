@@ -13,4 +13,10 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.upgrade-card{
+  background-color: antiquewhite;
+  color:black;
+  border-radius: 10px;
+}
+
 
