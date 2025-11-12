@@ -1,53 +1,97 @@
-import { useState } from 'react'
-import './MenuPlayer.css'
+import { useState, useEffect } from 'react';
+import './MenuPlayer.css';
 
 const upgrades = [
-  { id: 1, nome: 'Velocidade', custo: 100, descrição: 'Aumenta a velocidade do jogador' },
-  { id: 2, nome: 'Dano', custo: 150, descrição: 'Aumenta o Dano do ataque' },
-  { id: 3, nome: 'Defesa', custo: 120, descrição: 'Diminui a porcentagem do dano recebido' },
-  { id: 4, nome: 'Regeneração', custo: 200, descrição: 'Recupera vida automaticamente' },
-  { id: 5, nome: 'Crítico', custo: 180, descrição: 'Aumenta o dano crítico' },
-  { id: 6, nome: 'Sorte', custo: 160, descrição: 'Aumenta a sorte em geral' },
-  { id: 7, nome: 'Dash', custo: 600, descrição: 'Libera o Dash' },
-  { id: 8, nome: 'Escudo', custo: 700, descrição: 'Gera um escudo que protege o jogador de tiros' },
-]
+  { id: 1, nome: 'Velocidade', baseCusto: 100, descricao: 'Aumenta a velocidade do jogador', maxNivel: 5 },
+  { id: 2, nome: 'Dano', baseCusto: 150, descricao: 'Aumenta o dano do ataque', maxNivel: 5 },
+  { id: 3, nome: 'Defesa', baseCusto: 120, descricao: 'Diminui o dano recebido', maxNivel: 5 },
+  { id: 4, nome: 'Regeneração', baseCusto: 200, descricao: 'Recupera vida automaticamente', maxNivel: 5 },
+  { id: 5, nome: 'Crítico', baseCusto: 180, descricao: 'Aumenta o dano crítico', maxNivel: 5 },
+  { id: 6, nome: 'Sorte', baseCusto: 160, descricao: 'Aumenta a sorte em geral', maxNivel: 5 },
+  { id: 7, nome: 'Dash', baseCusto: 600, descricao: 'Libera o Dash', maxNivel: 1 },
+  { id: 8, nome: 'Escudo', baseCusto: 700, descricao: 'Gera um escudo que protege o jogador de tiros', maxNivel: 1 },
+];
 
 function MenuPlayer() {
   const [playerMoney, setPlayerMoney] = useState(500);
+  const [nivelUpgrades, setNivelUpgrades] = useState({});
+
+  useEffect(() => {
+    const savedMoney = localStorage.getItem('playerMoney');
+    const savedUpgrades = localStorage.getItem('nivelUpgrades');
+    if (savedMoney) setPlayerMoney(parseInt(savedMoney));
+    if (savedUpgrades) setNivelUpgrades(JSON.parse(savedUpgrades));
+  }, []);
+
+  const calcularCusto = (upgrade) => {
+    const nivelAtual = nivelUpgrades[upgrade.nome] || 0;
+    return Math.floor(upgrade.baseCusto * (1.3 ** nivelAtual));
+  };
+
+  const comprarUpgrade = (upgrade) => {
+    const nivelAtual = nivelUpgrades[upgrade.nome] || 0;
+    const custo = calcularCusto(upgrade);
+
+    if (playerMoney >= custo && nivelAtual < upgrade.maxNivel) {
+      const novoNivel = nivelAtual + 1;
+      const novoDinheiro = playerMoney - custo;
+
+      const novosUpgrades = { ...nivelUpgrades, [upgrade.nome]: novoNivel };
+      setNivelUpgrades(novosUpgrades);
+      setPlayerMoney(novoDinheiro);
+
+      localStorage.setItem('playerMoney', novoDinheiro);
+      localStorage.setItem('nivelUpgrades', JSON.stringify(novosUpgrades));
+    }
+  };
+
+  const resetarProgresso = () => {
+    if (confirm('Tem certeza que deseja resetar todo o progresso?')) {
+      localStorage.removeItem('playerMoney');
+      localStorage.removeItem('nivelUpgrades');
+      setPlayerMoney(500);
+      setNivelUpgrades({});
+    }
+  };
+
+  const jogar = () => {
+    window.location.href = 'jogo/jogo.html';
+  };
 
   return (
-    <>
-      <main>
-        <h1>Menu de Upgrades</h1>
-        <section className = "menu">
-          {upgrades.map((upgrade) => (
+    <main>
+      <h1>Menu de Upgrades</h1>
+      <p>💰 Dinheiro: ${playerMoney}</p>
+
+      <section className="menu">
+        {upgrades.map((upgrade) => {
+          const nivel = nivelUpgrades[upgrade.nome] || 0;
+          const custo = calcularCusto(upgrade);
+          const max = nivel >= upgrade.maxNivel;
+
+          return (
             <div key={upgrade.id} className="upgrade-card">
               <h2>{upgrade.nome}</h2>
-              <p>{upgrade.descrição}</p>
-              <p>Custo: ${upgrade.custo}</p>
+              <p>{upgrade.descricao}</p>
+              <p>Nível: {nivel}/{upgrade.maxNivel}</p>
+              <p>Custo: ${custo}</p>
               <button
-                type="button"
                 className="btn btn-outline-info"
-                onClick={() => {
-                  if (playerMoney >= upgrade.custo) {
-                    setPlayerMoney(playerMoney - upgrade.custo);
-                  }
-                }}
+                disabled={max || playerMoney < custo}
+                onClick={() => comprarUpgrade(upgrade)}
               >
-                Comprar
+                {max ? 'Máx' : 'Comprar'}
               </button>
             </div>
-          ))}
-        </section>
-      </main>
+          );
+        })}
+      </section>
 
-      <aside>
-        <div className = "dinheiro">
-          <p>Dinheiro: ${playerMoney}</p>
-        </div>
-      </aside>
-    </>
-  )
+      <div className="start-container">
+        <button onClick={resetarProgresso} className="btn btn-outline-danger">🔁 Resetar Progresso</button>
+      </div>
+    </main>
+  );
 }
 
-export default MenuPlayer
+export default MenuPlayer;

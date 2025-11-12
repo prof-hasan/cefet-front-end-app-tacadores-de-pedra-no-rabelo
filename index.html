@@ -4,11 +4,16 @@
     <meta charset="UTF-8" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/src/MenuPlayer.css" />
     <title>Bullet Hell - Menu</title>
   </head>
   <body>
+    <section id="start-section">
+      <div class="start-container">
+        <button id="start-btn" onclick="window.location.href='jogo/jogo.html'" class="btn btn-outline-success">Jogar</button>
+      </div>
+    </section>
     <div id="root"></div>
-    <button onclick="window.location.href='jogo/jogo.html'">Abrir Menu</button>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
