@@ -75,8 +75,9 @@ window.onload = function() {
 
     let posX = window.innerWidth / 2 - 25;
     let posY = window.innerHeight / 2 - 25;
-    let keys = { w: false, a: false, s: false, d: false, W: false, A: false, S: false, D: false };
+    let keys = { w: false, a: false, s: false, d: false, W: false, A: false, S: false, D: false, space: false };
 
+    danoSound = new Audio("../sounds/dano.wav");
     function checarColisao() {
         if (invulneravel) return;
         const inimigos = document.querySelectorAll('.inimigo');
@@ -89,6 +90,7 @@ window.onload = function() {
                 PosPersonagem.top < PosIn.bottom &&
                 PosPersonagem.bottom > PosIn.top
             ) {
+                danoSound.play();
                 vida -= danoI * (1 - defesa);
                 invulneravel = true;
                 personagem.style.opacity = '0.5';
@@ -106,16 +108,38 @@ window.onload = function() {
         });
     }
 
+    dashSound = new Audio("../sounds/dash_hiss.wav");
+    dashSound.volume = 0.6;
+    document.addEventListener("keydown", (e) => {
+            if(e.key === " " && canDash) {
+                keys.space = true;
+                canDash = false;
+                dashSound.play();
+                setTimeout(() => canDash = true, dashCooldown);
+            }
+    });
+
+
+    let dash = 25, dashForce = 1, canDash = true, dashCooldown = 1500;
     function moviment() {
         let dx = 0, dy = 0;
+
         if (keys.w || keys.W) dy -= 1;
         if (keys.s || keys.S) dy += 1;
         if (keys.a || keys.A) dx -= 1;
         if (keys.d || keys.D) dx += 1;
+
+
+
         if (dx !== 0 || dy !== 0) {
             const len = Math.sqrt(dx * dx + dy * dy);
             dx /= len;
             dy /= len;
+            if(keys.space === true) {
+                keys.space = false;
+                dx += dash * dashForce * dx;
+                dy += dash * dashForce * dy;
+            }
             posX += dx * speed;
             posY += dy * speed;
             posX = Math.max(0, Math.min(window.innerWidth - 50, posX));
@@ -124,8 +148,9 @@ window.onload = function() {
             personagem.style.top = posY + 'px';
         }
         personagem.textContent = vida.toFixed(1);
-        checarColisao();
+        
         requestAnimationFrame(moviment);
+        checarColisao();
     }
     moviment();
 

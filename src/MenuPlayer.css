@@ -39,7 +39,7 @@ body{
 
 .upgrade-card{
   background-color: black;
-  color: rgb(13, 202, 240);
+  color: rgb(255, 255, 255);
   border-radius: 10px;
   box-shadow: 2px 2px 10px rgb(126, 126, 126);
   /* ocupa a célula do grid, mas não ultrapassa 220px */
