@@ -101,7 +101,7 @@ window.onload = function() {
                     personagem.style.pointerEvents = 'auto';
                 }, invulTempo);
                 if (vida <= 0) {
-                    alert('Game Over!');
+                    alert('Game Over!\nSeu tempo: ' + timerDiv.textContent);
                     window.location.href = "../index.html";
                 }
             }

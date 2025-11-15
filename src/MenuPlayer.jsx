@@ -59,38 +59,53 @@ function MenuPlayer() {
   };
 
   return (
-    <main>
-      <h1>Menu de Upgrades</h1>
-      <p>💰 Dinheiro: ${playerMoney}</p>
+    <>
+      <main>
+        <section className="menu">
+          <h1>Menu de Upgrades</h1>
+          <p>💰 Dinheiro: ${playerMoney}</p>
+          <section className='upgrades'>
+            {upgrades.map((upgrade) => {
+              const nivel = nivelUpgrades[upgrade.nome] || 0;
+              const custo = calcularCusto(upgrade);
+              const max = nivel >= upgrade.maxNivel;
 
-      <section className="menu">
-        {upgrades.map((upgrade) => {
-          const nivel = nivelUpgrades[upgrade.nome] || 0;
-          const custo = calcularCusto(upgrade);
-          const max = nivel >= upgrade.maxNivel;
+              return (
+                <div key={upgrade.id} className="upgrade-card">
+                  <h2>{upgrade.nome}</h2>
+                  <p>{upgrade.descricao}</p>
+                  <p>Nível: {nivel}/{upgrade.maxNivel}</p>
+                  <p>Custo: ${custo}</p>
+                  <button
+                    className="btn btn-outline-info"
+                    disabled={max || playerMoney < custo}
+                    onClick={() => comprarUpgrade(upgrade)}
+                  >
+                    {max ? 'Máx' : 'Comprar'}
+                  </button>
+                </div>
+              );
+            })}
+          </section>
 
-          return (
-            <div key={upgrade.id} className="upgrade-card">
-              <h2>{upgrade.nome}</h2>
-              <p>{upgrade.descricao}</p>
-              <p>Nível: {nivel}/{upgrade.maxNivel}</p>
-              <p>Custo: ${custo}</p>
-              <button
-                className="btn btn-outline-info"
-                disabled={max || playerMoney < custo}
-                onClick={() => comprarUpgrade(upgrade)}
-              >
-                {max ? 'Máx' : 'Comprar'}
-              </button>
-            </div>
-          );
-        })}
-      </section>
+          <div className="reset-container">
+            <button onClick={resetarProgresso} className="btn btn-outline-danger">🔁 Resetar Progresso</button>
+          </div>
+        </section>
 
-      <div className="start-container">
-        <button onClick={resetarProgresso} className="btn btn-outline-danger">🔁 Resetar Progresso</button>
-      </div>
-    </main>
+        <section id="start-section">
+          <h2>NOME DO PLAYER</h2>
+          <h3>Melhor Tempo:</h3>
+
+          <div className="start-container">
+            <button id="start-btn" onClick={jogar} className="btn btn-outline-success">
+              Jogar
+            </button>
+          </div>
+        </section>
+
+      </main>
+    </>
   );
 }
 

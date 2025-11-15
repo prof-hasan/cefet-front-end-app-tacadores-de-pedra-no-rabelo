@@ -17,12 +17,6 @@ body{
   -moz-osx-font-smoothing: grayscale;
 }
 
-.start-container{
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  margin: 2rem 0 1rem 0;
-}
 
 #start-btn{
   font-size: 1.05rem;
@@ -31,20 +25,13 @@ body{
   box-shadow: 0 6px 18px rgba(0,0,0,0.35);
 }
 
-@media (max-width: 700px){
-  /* espaço reduzido em telas pequenas */
-  .start-container{ margin: 1rem 0 0.75rem 0; }
-  #start-btn{ font-size: 1rem; padding: 0.5rem 0.9rem; }
-}
-
 .upgrade-card{
   background-color: black;
   color: rgb(255, 255, 255);
   border-radius: 10px;
   box-shadow: 2px 2px 10px rgb(126, 126, 126);
-  /* ocupa a célula do grid, mas não ultrapassa 220px */
-  width: 100%;
-  max-width: 220px;
+  width: 210px;
+  height: 240px;
   aspect-ratio: 1 / 1;
   padding: 10px;
   margin: 0;
@@ -53,40 +40,28 @@ body{
 }
 
 
+main{
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
 
 .menu{
-  min-height: 100vh;
-  padding: 1rem;
-  display: grid;
-  grid-template-columns: repeat(3, 220px);
-  gap: 1rem;
-  justify-content: center; 
-  align-items: start;
-}
-
-
-.menu > :nth-last-child(2) {
-  grid-column: 1;
-}
-.menu > :last-child {
-  grid-column: 3;
-}
-
-@media (max-width: 700px) {
-  .menu{
-    grid-template-columns: 1fr;
-  }
-  .menu > :nth-last-child(2),
-  .menu > :last-child {
-    grid-column: auto;
-  }
-}
-
-
-#start-section{
-  display: flex;
-  width: 30%;
-  justify-content: center;
   align-items: center;
-  border: solid 1px black;
+  justify-items: center;
 }
+
+.upgrades{
+  display: grid;
+  grid-template-columns: repeat(3, minmax(220px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.reset-container{
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin: 2rem 0 1rem 0;
+}
+
