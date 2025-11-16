@@ -1,4 +1,7 @@
 window.onload = function() {
+    const personagem = document.getElementById("personagem");
+    const tela = document.getElementById("tela");
+
     let vidaMax = 20;
     let vida = vidaMax;
     let speed = 3;
@@ -7,16 +10,17 @@ window.onload = function() {
     let dashAtivo = false;
     let escudoAtivo = false;
     let regen = 0;
-    let critChance = 0.05;
-    let sorte = 0;
+    let sorte = 1;
+    let perf = 1;
 
     const upgrades = JSON.parse(localStorage.getItem('nivelUpgrades')) || {};
+    let money = parseInt(localStorage.getItem('playerMoney')) || 0;
 
     if (upgrades['Velocidade']) speed += upgrades['Velocidade'] * 0.5;
     if (upgrades['Dano']) dmg += upgrades['Dano'] * 5;
     if (upgrades['Defesa']) defesa = upgrades['Defesa'] * 0.05;
     if (upgrades['Regeneração']) regen = upgrades['Regeneração'] * 0.2;
-    if (upgrades['Crítico']) critChance += upgrades['Crítico'] * 0.05;
+    if (upgrades['Crítico']) perf += upgrades['Crítico'];
     if (upgrades['Sorte']) sorte += upgrades['Sorte'] * 2;
     if (upgrades['Dash']) dashAtivo = true;
     if (upgrades['Escudo']) escudoAtivo = true;
@@ -26,13 +30,11 @@ window.onload = function() {
     let danoI = 2;
     let vidamaxInimigo = 5;
     let velInimigo = 2;
-    let intervaloMin = 600;
-    let intervalo = 20000;
+    let intervaloMin = 1000;
+    let intervalo = 15000;
     let reducao = 0.97;
     let podeAtirar = true;
-    let tamanhoTiro = 10;
-    let perf = 1;
-    let intAtirar = 250;
+    let intAtirar = 1000;
 
     setInterval(() => {
         if (regen > 0 && vida < vidaMax) vida = Math.min(vida + regen, vidaMax);
@@ -44,34 +46,6 @@ window.onload = function() {
         return danoFinal;
     }
 
-    const container = document.createElement('div');
-    container.style.position = 'fixed';
-    container.style.top = '0';
-    container.style.left = '0';
-    container.style.width = '100vw';
-    container.style.height = '100vh';
-    container.style.background = '#222';
-    container.style.display = 'flex';
-    container.style.justifyContent = 'center';
-    container.style.alignItems = 'center';
-    container.id = 'tela';
-
-    const personagem = document.createElement('div');
-    personagem.id = 'personagem';
-    personagem.style.width = '50px';
-    personagem.style.height = '50px';
-    personagem.style.background = 'rgba(83, 206, 34, 1)';
-    personagem.style.borderRadius = '10px';
-    personagem.style.position = 'absolute';
-    personagem.style.display = 'flex';
-    personagem.style.justifyContent = 'center';
-    personagem.style.alignItems = 'center';
-    personagem.style.fontFamily = 'Arial, sans-serif';
-    personagem.style.fontSize = '20px';
-    personagem.style.color = '#fff';
-
-    container.appendChild(personagem);
-    document.body.appendChild(container);
 
     let posX = window.innerWidth / 2 - 25;
     let posY = window.innerHeight / 2 - 25;
@@ -110,15 +84,16 @@ window.onload = function() {
 
     dashSound = new Audio("../sounds/dash_hiss.wav");
     dashSound.volume = 0.6;
-    document.addEventListener("keydown", (e) => {
-            if(e.key === " " && canDash) {
-                keys.space = true;
-                canDash = false;
-                dashSound.play();
-                setTimeout(() => canDash = true, dashCooldown);
-            }
-    });
-
+    if(dashAtivo){
+        document.addEventListener("keydown", (e) => {
+                if(e.key === " " && canDash) {
+                    keys.space = true;
+                    canDash = false;
+                    dashSound.play();
+                    setTimeout(() => canDash = true, dashCooldown);
+                }
+        });
+    }
 
     let dash = 25, dashForce = 1, canDash = true, dashCooldown = 1500;
     function moviment() {
@@ -171,23 +146,15 @@ window.onload = function() {
             Math.abs(posYIn - personagemPos.top) < distanciaSegura
         );
         const inimigo = document.createElement('div');
-        inimigo.dataset.vida = vidamaxInimigo;
         inimigo.className = 'inimigo';
-        inimigo.style.width = '40px';
-        inimigo.style.height = '40px';
-        inimigo.style.background = 'rgba(255, 0, 0, 1)';
-        inimigo.style.borderRadius = '10px';
-        inimigo.style.position = 'absolute';
-        inimigo.textContent = vidamaxInimigo;
-        inimigo.style.display = 'flex';
-        inimigo.style.justifyContent = 'center';
-        inimigo.style.alignItems = 'center';
-        inimigo.style.fontFamily = 'Arial, sans-serif';
-        inimigo.style.fontSize = '18px';
-        inimigo.style.color = '#cfcfcfff';
+        inimigo.dataset.vida = vidamaxInimigo;
+
         inimigo.style.left = posXIn + 'px';
         inimigo.style.top = posYIn + 'px';
-        container.appendChild(inimigo);
+
+        inimigo.textContent = vidamaxInimigo;
+
+        tela.appendChild(inimigo);
         intervalo = Math.max(intervaloMin, intervalo * reducao);
         spawntime = setTimeout(spawnInimigo, intervalo);
     }
@@ -221,14 +188,11 @@ window.onload = function() {
         podeAtirar = false;
         const tiro = document.createElement('div');
         tiro.className = 'tiro';
-        tiro.style.width = tamanhoTiro + 'px';
-        tiro.style.height = tamanhoTiro + 'px';
-        tiro.style.background = '#ff0';
-        tiro.style.borderRadius = '50%';
-        tiro.style.position = 'absolute';
+
         tiro.style.left = posX + 20 + 'px';
         tiro.style.top = posY + 20 + 'px';
-        container.appendChild(tiro);
+
+        tela.appendChild(tiro);
         let tiroX = posX + 20;
         let tiroY = posY + 20;
         const mouseX = e.clientX;
@@ -265,6 +229,9 @@ window.onload = function() {
                     vidaInimigoAtual -= dmg;
                     if (vidaInimigoAtual <= 0) {
                         if (inimigo.parentNode) inimigo.parentNode.removeChild(inimigo);
+                        money += 1 * sorte;
+                        localStorage.setItem('playerMoney', money);
+
                     } else {
                         inimigo.dataset.vida = vidaInimigoAtual;
                         inimigo.textContent = vidaInimigoAtual;

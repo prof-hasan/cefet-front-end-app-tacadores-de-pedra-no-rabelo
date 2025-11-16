@@ -13,7 +13,7 @@ const upgrades = [
 ];
 
 function MenuPlayer() {
-  const [playerMoney, setPlayerMoney] = useState(500);
+  const [playerMoney, setPlayerMoney] = useState(0);
   const [nivelUpgrades, setNivelUpgrades] = useState({});
 
   useEffect(() => {
@@ -49,7 +49,7 @@ function MenuPlayer() {
     if (confirm('Tem certeza que deseja resetar todo o progresso?')) {
       localStorage.removeItem('playerMoney');
       localStorage.removeItem('nivelUpgrades');
-      setPlayerMoney(500);
+      setPlayerMoney(0);
       setNivelUpgrades({});
     }
   };
