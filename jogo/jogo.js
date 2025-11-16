@@ -34,7 +34,7 @@ window.onload = function() {
     let intervalo = 15000;
     let reducao = 0.97;
     let podeAtirar = true;
-    let intAtirar = 1000;
+    let intAtirar = 600;
 
     setInterval(() => {
         if (regen > 0 && vida < vidaMax) vida = Math.min(vida + regen, vidaMax);
@@ -75,6 +75,7 @@ window.onload = function() {
                     personagem.style.pointerEvents = 'auto';
                 }, invulTempo);
                 if (vida <= 0) {
+                    salvarRecorde();
                     alert('Game Over!\nSeu tempo: ' + timerDiv.textContent);
                     window.location.href = "../index.html";
                 }
@@ -264,4 +265,50 @@ window.onload = function() {
         setTimeout(() => { podeAtirar = true; }, intAtirar);
     }
     window.addEventListener('click', atirar);
+
+    const timerDiv = document.createElement("div");
+    timerDiv.style.position = "fixed";
+    timerDiv.style.left = "50%";
+    timerDiv.style.top = "40px";
+    timerDiv.style.transform = "translateX(-50%)";
+    timerDiv.style.color = "#fff";
+    timerDiv.style.fontSize = "2em";
+    timerDiv.style.fontFamily = "monospace";
+    timerDiv.style.background = "rgba(0,0,0,0.5)";
+    timerDiv.style.padding = "8px 18px";
+    timerDiv.style.borderRadius = "10px";
+    timerDiv.style.zIndex = "9999";
+    document.body.appendChild(timerDiv);
+
+    let tempo = 0;
+
+    function atualizarTimer() {
+        let min = Math.floor(tempo / 60);
+        let seg = tempo % 60;
+        timerDiv.textContent = `${min.toString().padStart(2, '0')}:${seg.toString().padStart(2, '0')}`;
+        tempo++;
+        setTimeout(atualizarTimer, 1000);
+    }
+
+    atualizarTimer();
+
+    function salvarRecorde() {
+        const atual = timerDiv.textContent;
+        const antigo = localStorage.getItem("melhorTempo");
+
+        if (!antigo) {
+            localStorage.setItem("melhorTempo", atual);
+            return;
+        }
+
+        const [minA, segA] = atual.split(":").map(Number);
+        const [minB, segB] = antigo.split(":").map(Number);
+
+        const totalA = minA * 60 + segA;
+        const totalB = minB * 60 + segB;
+
+        if (totalA > totalB) {
+            localStorage.setItem("melhorTempo", atual);
+        }
+    }
 }

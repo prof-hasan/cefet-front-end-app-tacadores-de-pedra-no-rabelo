@@ -23,6 +23,11 @@ function MenuPlayer() {
     if (savedUpgrades) setNivelUpgrades(JSON.parse(savedUpgrades));
   }, []);
 
+  const melhorTempo = () => {
+    const tempo = localStorage.getItem('melhorTempo');
+    return tempo ? tempo : '00:00';
+  };
+
   const calcularCusto = (upgrade) => {
     const nivelAtual = nivelUpgrades[upgrade.nome] || 0;
     return Math.floor(upgrade.baseCusto * (1.3 ** nivelAtual));
@@ -64,6 +69,7 @@ function MenuPlayer() {
         <section className="menu">
           <h1>Menu de Upgrades</h1>
           <p>💰 Dinheiro: ${playerMoney}</p>
+
           <section className='upgrades'>
             {upgrades.map((upgrade) => {
               const nivel = nivelUpgrades[upgrade.nome] || 0;
@@ -76,10 +82,11 @@ function MenuPlayer() {
                   <p>{upgrade.descricao}</p>
                   <p>Nível: {nivel}/{upgrade.maxNivel}</p>
                   <p>Custo: ${custo}</p>
+
                   <button
-                    className="btn btn-outline-info"
                     disabled={max || playerMoney < custo}
                     onClick={() => comprarUpgrade(upgrade)}
+                    className="btn btn-outline-info"
                   >
                     {max ? 'Máx' : 'Comprar'}
                   </button>
@@ -89,13 +96,15 @@ function MenuPlayer() {
           </section>
 
           <div className="reset-container">
-            <button onClick={resetarProgresso} className="btn btn-outline-danger">🔁 Resetar Progresso</button>
+            <button onClick={resetarProgresso} className="btn btn-outline-danger">
+              🔁 Resetar Progresso
+            </button>
           </div>
         </section>
 
         <section id="start-section">
           <h2>NOME DO PLAYER</h2>
-          <h3>Melhor Tempo:</h3>
+          <h3>Melhor Tempo: {melhorTempo()}</h3>
 
           <div className="start-container">
             <button id="start-btn" onClick={jogar} className="btn btn-outline-success">
@@ -103,7 +112,6 @@ function MenuPlayer() {
             </button>
           </div>
         </section>
-
       </main>
     </>
   );
