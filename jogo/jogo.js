@@ -48,6 +48,7 @@ window.onload = function() {
     danoSound = new Audio("../sounds/dano.wav");
     function checarColisao() {
         if (invulneravel) return;
+        if(emDash) return;
         const inimigos = document.querySelectorAll('.inimigo');
         const PosPersonagem = personagem.getBoundingClientRect();
         inimigos.forEach(inimigo => {
@@ -81,12 +82,15 @@ window.onload = function() {
 
     dashSound = new Audio("../sounds/dash_hiss.wav");
     dashSound.volume = 0.6;
+    let emDash = false;
     if(dashAtivo){
         document.addEventListener("keydown", (e) => {
                 if(e.key === " " && canDash) {
+                    emdash = true;
                     keys.space = true;
                     canDash = false;
                     dashSound.play();
+                    setTimeout(() => emdash = false, 500);
                     setTimeout(() => canDash = true, dashCooldown);
                 }
         });
