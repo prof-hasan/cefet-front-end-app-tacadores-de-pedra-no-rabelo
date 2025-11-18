@@ -104,8 +104,7 @@ function MenuPlayer() {
         </section>
 
         <section id="start-section">
-          <h2>NOME DO PLAYER</h2>
-          <h3>Melhor Tempo: {melhorTempo()}</h3>
+          <h3>Seu Melhor Tempo: {melhorTempo()}</h3>
 
           <div className="start-container">
             <button id="start-btn" onClick={jogar} className="btn btn-outline-success">
