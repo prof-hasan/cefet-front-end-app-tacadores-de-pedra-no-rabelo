@@ -71,7 +71,9 @@ window.onload = function() {
                 }, invulTempo);
                 if (vida <= 0) {
                     salvarRecorde();
-                    window.location.href = "../index.html";
+                    setTimeout(() => {
+                        window.location.href = "../index.html";
+                    }, 300);
                 }
             }
         });
