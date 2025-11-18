@@ -22,6 +22,8 @@
     justify-content: center;
     font-family: Arial, sans-serif;
     color: white;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .inimigo {
@@ -36,6 +38,8 @@
     color: #eee;
     font-family: Arial, sans-serif;
     font-size: 18px;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .tiro {
