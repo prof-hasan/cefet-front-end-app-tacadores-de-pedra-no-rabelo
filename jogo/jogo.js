@@ -275,10 +275,13 @@ window.onload = function() {
     document.body.appendChild(timerDiv);
 
     let tempo = 0;
+    let mininicial = 0;
+    let min;
+    let seg;
 
     function atualizarTimer() {
-        let min = Math.floor(tempo / 60);
-        let seg = tempo % 60;
+        min = Math.floor(tempo / 60);
+        seg = tempo % 60;
         timerDiv.textContent = `${min.toString().padStart(2, '0')}:${seg.toString().padStart(2, '0')}`;
         tempo++;
         setTimeout(atualizarTimer, 1000);
@@ -305,4 +308,15 @@ window.onload = function() {
             localStorage.setItem("melhorTempo", atual);
         }
     }
+
+    function upInimigos(){
+        if(min > mininicial){
+            vidamaxInimigo += 1;
+            danoI += 1;
+            velInimigo += 0.2;
+            mininicial = min;
+        }
+    }   
+    setInterval(upInimigos, 1000);
+
 }
