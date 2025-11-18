@@ -10,8 +10,9 @@ window.onload = function() {
     let dashAtivo = false;
     let escudoAtivo = false;
     let regen = 0;
-    let sorte = 1;
+    let sorte = 2;
     let perf = 1;
+    let intAtirar = 600;
 
     const upgrades = JSON.parse(localStorage.getItem('nivelUpgrades')) || {};
     let money = parseInt(localStorage.getItem('playerMoney')) || 0;
@@ -24,6 +25,8 @@ window.onload = function() {
     if (upgrades['Sorte']) sorte += upgrades['Sorte'] * 2;
     if (upgrades['Dash']) dashAtivo = true;
     if (upgrades['Escudo']) escudoAtivo = true;
+    if (upgrades['FireRate'])intAtirar -= upgrades['FireRate'] * 100;
+    if (upgrades['Vida']) vidaMax -= upgrades['Vida'] * 5;
 
     let invulneravel = false;
     let invulTempo = 700;
@@ -34,7 +37,6 @@ window.onload = function() {
     let intervalo = 15000;
     let reducao = 0.97;
     let podeAtirar = true;
-    let intAtirar = 600;
 
     setInterval(() => {
         if (regen > 0 && vida < vidaMax) vida = Math.min(vida + regen, vidaMax);
@@ -230,7 +232,7 @@ window.onload = function() {
                     vidaInimigoAtual -= dmg;
                     if (vidaInimigoAtual <= 0) {
                         if (inimigo.parentNode) inimigo.parentNode.removeChild(inimigo);
-                        money += 1 * sorte;
+                        money += 5 * sorte;
                         localStorage.setItem('playerMoney', money);
 
                     } else {

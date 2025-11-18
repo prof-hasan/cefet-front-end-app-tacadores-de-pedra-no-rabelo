@@ -7,9 +7,11 @@ const upgrades = [
   { id: 3, nome: 'Defesa', baseCusto: 120, descricao: 'Diminui o dano recebido', maxNivel: 5 },
   { id: 4, nome: 'Regeneração', baseCusto: 200, descricao: 'Recupera vida automaticamente', maxNivel: 5 },
   { id: 5, nome: 'Crítico', baseCusto: 180, descricao: 'Aumenta o dano crítico', maxNivel: 5 },
-  { id: 6, nome: 'Sorte', baseCusto: 160, descricao: 'Aumenta a sorte em geral', maxNivel: 5 },
+  { id: 6, nome: 'Sorte', baseCusto: 160, descricao: 'Aumenta o dinheiro ganho por morte', maxNivel: 5 },
   { id: 7, nome: 'Dash', baseCusto: 600, descricao: 'Libera o Dash', maxNivel: 1 },
   { id: 8, nome: 'Escudo', baseCusto: 700, descricao: 'Gera um escudo que protege o jogador de tiros', maxNivel: 1 },
+  { id: 9, nome: 'FireRate', baseCusto: 200, descricao: 'Aumenta a velocidade de tiro do jogador', maxNivel: 5},
+  { id: 10, nome: 'Vida', baseCusto: 100, descricao: 'Aumenta a vida máxima do jogador', maxNivel: 6},
 ];
 
 function MenuPlayer() {
