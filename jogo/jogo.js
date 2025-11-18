@@ -165,11 +165,13 @@ window.onload = function() {
     function spawnInimigo() {
         const personagemEl = document.getElementById('personagem');
         const personagemPos = personagemEl.getBoundingClientRect();
-        let posXIn, posYIn = -10;
+        let posXIn, posYIn;
         let distanciaSegura = 200;
         do {
             posXIn = Math.random() * (window.innerWidth - 40);
+            posYIn = Math.random() * (window.innerHeight - 40);
         } while (
+            Math.abs(posYIn - personagemPos.top) < distanciaSegura ||
             Math.abs(posXIn - personagemPos.left) < distanciaSegura
         );
         const inimigo = document.createElement('div');
