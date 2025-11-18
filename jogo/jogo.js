@@ -128,7 +128,8 @@ window.onload = function() {
             if(keys.d || keys.D) {
                 personagem.style.transform = 'rotate(135deg)';
             }
-        }d
+        }
+
         if (dx !== 0 || dy !== 0) {
             const len = Math.sqrt(dx * dx + dy * dy);
             dx /= len;
