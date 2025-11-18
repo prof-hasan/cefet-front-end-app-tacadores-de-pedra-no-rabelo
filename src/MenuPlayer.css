@@ -1,6 +1,6 @@
 body{
   display: flex;
-  background-color: #000c24;
+  background-color: #292727;
 }
 
 :root {
@@ -26,10 +26,10 @@ body{
 }
 
 .upgrade-card{
-  background-color: black;
-  color: rgb(255, 255, 255);
+  background-color: rgb(0, 0, 0);
+  color: antiquewhite;
   border-radius: 10px;
-  box-shadow: 2px 2px 10px rgb(126, 126, 126);
+  border: solid 1px;
   width: 210px;
   height: 240px;
   aspect-ratio: 1 / 1;
@@ -42,8 +42,9 @@ body{
 
 main{
   width: 100%;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
 }
 
 .menu{

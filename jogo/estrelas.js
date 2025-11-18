@@ -1,5 +1,6 @@
 let estrelas = [];
 
+
 function Estrela() {
     this.el = document.createElement('img');
     this.el.src = 'https://img.freepik.com/vetores-premium/ilustracao-vetorial-isolada-do-icone-shine-star-black_34480-1056.jpg?semt=ais_incoming&w=740&q=80';
