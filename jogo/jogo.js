@@ -3,7 +3,6 @@ window.onload = function() {
     const tela = document.getElementById("tela");
 
     let vidaMax = 20;
-    let vida = vidaMax;
     let speed = 3;
     let dmg = 1;
     let defesa = 0;
@@ -24,9 +23,10 @@ window.onload = function() {
     if (upgrades['Crítico']) perf += upgrades['Crítico'];
     if (upgrades['Sorte']) sorte += upgrades['Sorte'] * 2;
     if (upgrades['Dash']) dashAtivo = true;
-    if (upgrades['Escudo']) escudoAtivo = true;
     if (upgrades['FireRate'])intAtirar -= upgrades['FireRate'] * 100;
     if (upgrades['Vida']) vidaMax += upgrades['Vida'] * 5;
+
+    let vida = vidaMax;
 
     let invulneravel = false;
     let invulTempo = 700;
