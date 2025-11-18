@@ -26,7 +26,7 @@ window.onload = function() {
     if (upgrades['Dash']) dashAtivo = true;
     if (upgrades['Escudo']) escudoAtivo = true;
     if (upgrades['FireRate'])intAtirar -= upgrades['FireRate'] * 100;
-    if (upgrades['Vida']) vidaMax -= upgrades['Vida'] * 5;
+    if (upgrades['Vida']) vidaMax += upgrades['Vida'] * 5;
 
     let invulneravel = false;
     let invulTempo = 700;
@@ -34,20 +34,13 @@ window.onload = function() {
     let vidamaxInimigo = 5;
     let velInimigo = 2;
     let intervaloMin = 1000;
-    let intervalo = 15000;
-    let reducao = 0.97;
+    let intervalo = 10000;
+    let reducao = 0.95;
     let podeAtirar = true;
 
     setInterval(() => {
         if (regen > 0 && vida < vidaMax) vida = Math.min(vida + regen, vidaMax);
     }, 2000);
-
-    function atacar() {
-        let danoFinal = dmg;
-        if (Math.random() < critChance) danoFinal *= 2;
-        return danoFinal;
-    }
-
 
     let posX = window.innerWidth / 2 - 25;
     let posY = window.innerHeight / 2 - 25;
@@ -78,7 +71,6 @@ window.onload = function() {
                 }, invulTempo);
                 if (vida <= 0) {
                     salvarRecorde();
-                    alert('Game Over!\nSeu tempo: ' + timerDiv.textContent);
                     window.location.href = "../index.html";
                 }
             }
