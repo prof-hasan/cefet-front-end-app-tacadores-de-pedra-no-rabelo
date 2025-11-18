@@ -69,6 +69,7 @@ window.onload = function() {
                     personagem.style.pointerEvents = 'auto';
                 }, invulTempo);
                 if (vida <= 0) {
+                    vida = 0;
                     salvarRecorde();
                     setTimeout(() => {
                         window.location.href = "../index.html";
