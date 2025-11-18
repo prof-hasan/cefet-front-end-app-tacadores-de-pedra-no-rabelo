@@ -7,7 +7,6 @@ window.onload = function() {
     let dmg = 1;
     let defesa = 0;
     let dashAtivo = false;
-    let escudoAtivo = false;
     let regen = 0;
     let sorte = 2;
     let perf = 1;
@@ -17,7 +16,7 @@ window.onload = function() {
     let money = parseInt(localStorage.getItem('playerMoney')) || 0;
 
     if (upgrades['Velocidade']) speed += upgrades['Velocidade'] * 0.5;
-    if (upgrades['Dano']) dmg += upgrades['Dano'] * 5;
+    if (upgrades['Dano']) dmg += upgrades['Dano'];
     if (upgrades['Defesa']) defesa = upgrades['Defesa'] * 0.05;
     if (upgrades['Regeneração']) regen = upgrades['Regeneração'] * 0.2;
     if (upgrades['Crítico']) perf += upgrades['Crítico'];
@@ -96,13 +95,40 @@ window.onload = function() {
     function moviment() {
         let dx = 0, dy = 0;
 
-        if (keys.w || keys.W) dy -= 1;
-        if (keys.s || keys.S) dy += 1;
-        if (keys.a || keys.A) dx -= 1;
-        if (keys.d || keys.D) dx += 1;
+        if (keys.w || keys.W){ 
+            dy -= 1;
+            personagem.style.transform = 'rotate(0deg)';
+        }
+        if (keys.s || keys.S){
+            dy += 1;
+            personagem.style.transform = 'rotate(180deg)';
+        }
+        if (keys.a || keys.A){ 
+            dx -= 1;
+            personagem.style.transform = 'rotate(270deg)';
+        }
+        if (keys.d || keys.D){ 
+            dx += 1;
+            personagem.style.transform = 'rotate(90deg)';
+        }
 
 
-
+        if(keys.w || keys.W) {
+            if(keys.a || keys.A) {
+                personagem.style.transform = 'rotate(315deg)';
+            }
+            if(keys.d || keys.D) {
+                personagem.style.transform = 'rotate(45deg)';
+            }
+        }
+        if(keys.s || keys.S) {
+            if(keys.a || keys.A) {
+                personagem.style.transform = 'rotate(225deg)';
+            }   
+            if(keys.d || keys.D) {
+                personagem.style.transform = 'rotate(135deg)';
+            }
+        }d
         if (dx !== 0 || dy !== 0) {
             const len = Math.sqrt(dx * dx + dy * dy);
             dx /= len;
