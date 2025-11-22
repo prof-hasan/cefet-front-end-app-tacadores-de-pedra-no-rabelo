@@ -59,8 +59,11 @@ function MenuPlayer() {
     if (confirm('Tem certeza que deseja resetar todo o progresso?')) {
       localStorage.removeItem('playerMoney');
       localStorage.removeItem('nivelUpgrades');
+      localStorage.removeItem('melhorTempo');
       setPlayerMoney(0);
       setNivelUpgrades({});
+      setBestTime('00:00');
+      
     }
   };
 
