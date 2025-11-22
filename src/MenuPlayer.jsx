@@ -6,7 +6,7 @@ const upgrades = [
   { id: 2, nome: 'Dano', baseCusto: 150, descricao: 'Aumenta o dano do ataque', maxNivel: 5 },
   { id: 3, nome: 'Defesa', baseCusto: 120, descricao: 'Diminui o dano recebido', maxNivel: 5 },
   { id: 4, nome: 'Regeneração', baseCusto: 200, descricao: 'Recupera vida automaticamente', maxNivel: 5 },
-  { id: 5, nome: 'Crítico', baseCusto: 180, descricao: 'Aumenta o dano crítico', maxNivel: 5 },
+  { id: 5, nome: 'Perfuração', baseCusto: 180, descricao: 'Aumenta a quantidade de imigos perfurados', maxNivel: 5 },
   { id: 6, nome: 'Sorte', baseCusto: 160, descricao: 'Aumenta o dinheiro ganho por morte', maxNivel: 5 },
   { id: 7, nome: 'Dash', baseCusto: 600, descricao: 'Libera o Dash', maxNivel: 1 },
   { id: 8, nome: 'FireRate', baseCusto: 200, descricao: 'Aumenta a velocidade de tiro do jogador', maxNivel: 5},
@@ -24,6 +24,7 @@ function MenuPlayer() {
     if (savedUpgrades) setNivelUpgrades(JSON.parse(savedUpgrades));
   }, []);
 
+
   const melhorTempo = () => {
     const tempo = localStorage.getItem('melhorTempo');
     return tempo ? tempo : '00:00';
@@ -37,10 +38,13 @@ function MenuPlayer() {
   const comprarUpgrade = (upgrade) => {
     const nivelAtual = nivelUpgrades[upgrade.nome] || 0;
     const custo = calcularCusto(upgrade);
+    const compraSound = new Audio("../sounds/compra.mp3");
+    compraSound.volume = 0.6;
 
     if (playerMoney >= custo && nivelAtual < upgrade.maxNivel) {
       const novoNivel = nivelAtual + 1;
       const novoDinheiro = playerMoney - custo;
+      compraSound.play();
 
       const novosUpgrades = { ...nivelUpgrades, [upgrade.nome]: novoNivel };
       setNivelUpgrades(novosUpgrades);

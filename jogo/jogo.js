@@ -1,4 +1,4 @@
-window.onload = function() {
+window.onload = function () {
     const personagem = document.getElementById("personagem");
     const tela = document.getElementById("tela");
 
@@ -15,14 +15,14 @@ window.onload = function() {
     const upgrades = JSON.parse(localStorage.getItem('nivelUpgrades')) || {};
     let money = parseInt(localStorage.getItem('playerMoney')) || 0;
 
-    if (upgrades['Velocidade']) speed += upgrades['Velocidade'] * 0.5;
+    if (upgrades['Velocidade']) speed += upgrades['Velocidade'] * 0.25;
     if (upgrades['Dano']) dmg += upgrades['Dano'];
     if (upgrades['Defesa']) defesa = upgrades['Defesa'] * 0.05;
     if (upgrades['Regeneração']) regen = upgrades['Regeneração'] * 0.2;
-    if (upgrades['Crítico']) perf += upgrades['Crítico'];
+    if (upgrades['Perfuração']) perf += upgrades['Perfuração'];
     if (upgrades['Sorte']) sorte += upgrades['Sorte'] * 2;
     if (upgrades['Dash']) dashAtivo = true;
-    if (upgrades['FireRate'])intAtirar -= upgrades['FireRate'] * 100;
+    if (upgrades['FireRate']) intAtirar -= upgrades['FireRate'] * 100;
     if (upgrades['Vida']) vidaMax += upgrades['Vida'] * 5;
 
     let vida = vidaMax;
@@ -38,37 +38,71 @@ window.onload = function() {
     let podeAtirar = true;
 
     setInterval(() => {
-        if (regen > 0 && vida < vidaMax) vida = Math.min(vida + regen, vidaMax);
+        if (regen > 0 && vida < vidaMax)
+            vida = Math.min(vida + regen, vidaMax);
     }, 2000);
 
     let posX = window.innerWidth / 2 - 25;
     let posY = window.innerHeight / 2 - 25;
-    let keys = { w: false, a: false, s: false, d: false, W: false, A: false, S: false, D: false, space: false };
+
+    let keys = {
+        w: false, a: false, s: false, d: false,
+        W: false, A: false, S: false, D: false
+    };
 
     danoSound = new Audio("../sounds/dano.wav");
+
+    let isDashing = false;
+    let canDash = true;
+    let dashCooldown = 1500;
+    let dashDuration = 1000;
+    let dashMultiplicador = 2;
+
+    dashSound = new Audio("../sounds/dash_hiss.wav");
+    dashSound.volume = 0.6;
+
+    if (dashAtivo) {
+        document.addEventListener("keydown", (e) => {
+            if (e.key === " " && canDash) {
+                isDashing = true;
+                canDash = false;
+                dashSound.play();
+
+                setTimeout(() => { isDashing = false }, dashDuration);
+                setTimeout(() => { canDash = true }, dashCooldown);
+            }
+        });
+    }
+
+
     function checarColisao() {
         if (invulneravel) return;
-        if(emDash) return;
+        if (isDashing) return;
+
         const inimigos = document.querySelectorAll('.inimigo');
         const PosPersonagem = personagem.getBoundingClientRect();
+
         inimigos.forEach(inimigo => {
             const PosIn = inimigo.getBoundingClientRect();
-            if (
+
+            const colidiu =
                 PosPersonagem.left < PosIn.right &&
                 PosPersonagem.right > PosIn.left &&
                 PosPersonagem.top < PosIn.bottom &&
-                PosPersonagem.bottom > PosIn.top
-            ) {
+                PosPersonagem.bottom > PosIn.top;
+
+            if (colidiu) {
                 danoSound.play();
                 vida -= danoI * (1 - defesa);
+
                 invulneravel = true;
                 personagem.style.opacity = '0.5';
-                personagem.style.pointerEvents = 'none';
+
                 setTimeout(() => {
                     invulneravel = false;
                     personagem.style.opacity = '1';
-                    personagem.style.pointerEvents = 'auto';
                 }, invulTempo);
+
                 if (vida <= 0) {
                     vida = 0;
                     salvarRecorde();
@@ -80,93 +114,57 @@ window.onload = function() {
         });
     }
 
-    dashSound = new Audio("../sounds/dash_hiss.wav");
-    dashSound.volume = 0.6;
-    let emDash = false;
-    if(dashAtivo){
-        document.addEventListener("keydown", (e) => {
-                if(e.key === " " && canDash) {
-                    emdash = true;
-                    keys.space = true;
-                    canDash = false;
-                    dashSound.play();
-                    setTimeout(() => emdash = false, 500);
-                    setTimeout(() => canDash = true, dashCooldown);
-                }
-        });
-    }
 
-    let dash = 25, dashForce = 1, canDash = true, dashCooldown = 1500;
     function moviment() {
         let dx = 0, dy = 0;
 
-        if (keys.w || keys.W){ 
-            dy -= 1;
-            personagem.style.transform = 'rotate(0deg)';
-        }
-        if (keys.s || keys.S){
-            dy += 1;
-            personagem.style.transform = 'rotate(180deg)';
-        }
-        if (keys.a || keys.A){ 
-            dx -= 1;
-            personagem.style.transform = 'rotate(270deg)';
-        }
-        if (keys.d || keys.D){ 
-            dx += 1;
-            personagem.style.transform = 'rotate(90deg)';
-        }
+        if (keys.w || keys.W) dy -= 1;
+        if (keys.s || keys.S) dy += 1;
+        if (keys.a || keys.A) dx -= 1;
+        if (keys.d || keys.D) dx += 1;
 
-
-        if(keys.w || keys.W) {
-            if(keys.a || keys.A) {
-                personagem.style.transform = 'rotate(315deg)';
-            }
-            if(keys.d || keys.D) {
-                personagem.style.transform = 'rotate(45deg)';
-            }
-        }
-        if(keys.s || keys.S) {
-            if(keys.a || keys.A) {
-                personagem.style.transform = 'rotate(225deg)';
-            }   
-            if(keys.d || keys.D) {
-                personagem.style.transform = 'rotate(135deg)';
-            }
+        if (dx !== 0 || dy !== 0) {
+            const ang = Math.atan2(dy, dx) * 180 / Math.PI;
+            personagem.style.transform = `rotate(${ang + 90}deg)`;
         }
 
         if (dx !== 0 || dy !== 0) {
             const len = Math.sqrt(dx * dx + dy * dy);
             dx /= len;
             dy /= len;
-            if(keys.space === true) {
-                keys.space = false;
-                dx += dash * dashForce * dx;
-                dy += dash * dashForce * dy;
-            }
-            posX += dx * speed;
-            posY += dy * speed;
+
+            let velFinal = speed;
+            if (isDashing) velFinal *= dashMultiplicador;
+
+            posX += dx * velFinal;
+            posY += dy * velFinal;
+
             posX = Math.max(0, Math.min(window.innerWidth - 50, posX));
             posY = Math.max(0, Math.min(window.innerHeight - 50, posY));
+
             personagem.style.left = posX + 'px';
             personagem.style.top = posY + 'px';
         }
+
         personagem.textContent = vida.toFixed(1);
-        
-        requestAnimationFrame(moviment);
+
         checarColisao();
+        requestAnimationFrame(moviment);
     }
     moviment();
 
     window.addEventListener('keydown', e => { if (e.key in keys) keys[e.key] = true; });
     window.addEventListener('keyup', e => { if (e.key in keys) keys[e.key] = false; });
 
+
     let spawntime;
+
     function spawnInimigo() {
-        const personagemEl = document.getElementById('personagem');
-        const personagemPos = personagemEl.getBoundingClientRect();
+        const personagemPos = personagem.getBoundingClientRect();
+
         let posXIn, posYIn;
-        let distanciaSegura = 200;
+        const distanciaSegura = 200;
+
         do {
             posXIn = Math.random() * (window.innerWidth - 40);
             posYIn = Math.random() * (window.innerHeight - 40);
@@ -174,16 +172,17 @@ window.onload = function() {
             Math.abs(posYIn - personagemPos.top) < distanciaSegura ||
             Math.abs(posXIn - personagemPos.left) < distanciaSegura
         );
+
         const inimigo = document.createElement('div');
         inimigo.className = 'inimigo';
         inimigo.dataset.vida = vidamaxInimigo;
 
         inimigo.style.left = posXIn + 'px';
         inimigo.style.top = posYIn + 'px';
-
         inimigo.textContent = vidamaxInimigo;
 
         tela.appendChild(inimigo);
+
         intervalo = Math.max(intervaloMin, intervalo * reducao);
         spawntime = setTimeout(spawnInimigo, intervalo);
     }
@@ -191,23 +190,28 @@ window.onload = function() {
 
     function moverInimigos() {
         const inimigos = document.querySelectorAll('.inimigo');
+
         inimigos.forEach(inimigo => {
-            let inimigoX = parseFloat(inimigo.style.left) || inimigo.getBoundingClientRect().left;
-            let inimigoY = parseFloat(inimigo.style.top) || inimigo.getBoundingClientRect().top;
-            let alvoX = posX;
-            let alvoY = posY;
-            let dx = alvoX - inimigoX;
-            let dy = alvoY - inimigoY;
+            let inimigoX = parseFloat(inimigo.style.left);
+            let inimigoY = parseFloat(inimigo.style.top);
+
+            let dx = posX - inimigoX;
+            let dy = posY - inimigoY;
+
             let dist = Math.sqrt(dx * dx + dy * dy);
+
             if (dist > 1) {
                 dx /= dist;
                 dy /= dist;
+
                 inimigoX += dx * velInimigo;
                 inimigoY += dy * velInimigo;
+
                 inimigo.style.left = inimigoX + 'px';
                 inimigo.style.top = inimigoY + 'px';
             }
         });
+
         requestAnimationFrame(moverInimigos);
     }
     moverInimigos();
@@ -215,84 +219,92 @@ window.onload = function() {
     function atirar(e) {
         if (!podeAtirar) return;
         podeAtirar = false;
+
         const tiro = document.createElement('div');
         tiro.className = 'tiro';
 
-        tiro.style.left = posX + 20 + 'px';
-        tiro.style.top = posY + 20 + 'px';
-
-        tela.appendChild(tiro);
         let tiroX = posX + 20;
         let tiroY = posY + 20;
-        const mouseX = e.clientX;
-        const mouseY = e.clientY;
-        let dx = mouseX - tiroX;
-        let dy = mouseY - tiroY;
+
+        tiro.style.left = tiroX + 'px';
+        tiro.style.top = tiroY + 'px';
+        tela.appendChild(tiro);
+
+        let dx = e.clientX - tiroX;
+        let dy = e.clientY - tiroY;
+
         const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist === 0) {
-            dx = 0; dy = -1;
-        } else {
-            dx /= dist; dy /= dist;
-        }
+        dx /= dist;
+        dy /= dist;
+
         const velTiro = 8;
         let perfTiro = perf;
+
         let inimigosAtingidos = [];
-        function dTiro() {
+
+        function moverTiro() {
             if (!tiro.parentNode) return;
+
             tiroX += dx * velTiro;
             tiroY += dy * velTiro;
+
             tiro.style.left = tiroX + 'px';
             tiro.style.top = tiroY + 'px';
+
             const inimigos = document.querySelectorAll('.inimigo');
-            for (let i = 0; i < inimigos.length; i++) {
-                const inimigo = inimigos[i];
+            for (let inimigo of inimigos) {
                 const posTiro = tiro.getBoundingClientRect();
-                const posInimigo = inimigo.getBoundingClientRect();
-                const colide = (posTiro.left < posInimigo.right &&
-                                posTiro.right > posInimigo.left &&
-                                posTiro.top < posInimigo.bottom &&
-                                posTiro.bottom > posInimigo.top);
+                const posIn = inimigo.getBoundingClientRect();
+
+                const colide =
+                    posTiro.left < posIn.right &&
+                    posTiro.right > posIn.left &&
+                    posTiro.top < posIn.bottom &&
+                    posTiro.bottom > posIn.top;
+
                 if (colide && !inimigosAtingidos.includes(inimigo)) {
                     inimigosAtingidos.push(inimigo);
-                    let vidaInimigoAtual = parseInt(inimigo.dataset.vida, 10) || 0;
-                    vidaInimigoAtual -= dmg;
-                    if (vidaInimigoAtual <= 0) {
-                        if (inimigo.parentNode) inimigo.parentNode.removeChild(inimigo);
+
+                    let vidaIn = parseInt(inimigo.dataset.vida);
+                    vidaIn -= dmg;
+
+                    if (vidaIn <= 0) {
+                        inimigo.remove();
                         money += 5 * sorte;
                         localStorage.setItem('playerMoney', money);
-
                     } else {
-                        inimigo.dataset.vida = vidaInimigoAtual;
-                        inimigo.textContent = vidaInimigoAtual;
+                        inimigo.dataset.vida = vidaIn;
+                        inimigo.textContent = vidaIn;
                     }
+
                     perfTiro--;
                     if (perfTiro <= 0) {
-                        if (tiro.parentNode) tiro.parentNode.removeChild(tiro);
+                        tiro.remove();
                         return;
                     }
                 }
             }
-            if (tiroX < 0 || tiroX > window.innerWidth || tiroY < 0 || tiroY > window.innerHeight) {
-                if (tiro.parentNode) tiro.parentNode.removeChild(tiro);
+
+            if (
+                tiroX < 0 || tiroX > window.innerWidth ||
+                tiroY < 0 || tiroY > window.innerHeight
+            ) {
+                tiro.remove();
                 return;
             }
-            inimigosAtingidos = inimigosAtingidos.filter(inimigo => {
-                if (!inimigo.parentNode) return false;
-                const posChefe = inimigo.getBoundingClientRect();
-                const posT = tiro.getBoundingClientRect();
-                return (
-                    posT.left < posChefe.right &&
-                    posT.right > posChefe.left &&
-                    posT.top < posChefe.bottom &&
-                    posT.bottom > posChefe.top
-                );
-            });
-            requestAnimationFrame(dTiro);
+
+            requestAnimationFrame(moverTiro);
         }
-        dTiro();
-        setTimeout(() => { podeAtirar = true; }, intAtirar);
+
+        moverTiro();
+
+        setTimeout(() => {
+            podeAtirar = true;
+        }, intAtirar);
     }
-    window.addEventListener('click', atirar);
+
+    window.addEventListener("click", atirar);
+
 
     const timerDiv = document.createElement("div");
     timerDiv.style.position = "fixed";
@@ -308,20 +320,33 @@ window.onload = function() {
     timerDiv.style.zIndex = "9999";
     document.body.appendChild(timerDiv);
 
-    let tempo = 0;
-    let mininicial = 0;
-    let min;
-    let seg;
+    let tempo = 0, mininicial = 0, min, seg;
+
+    // --- apenas conta tempo se o jogador estiver ativo ---
+    let isPlaying = true;
+    let lastActivity = Date.now();
+    const idleTimeout = 3000;
+    const markActivity = () => { lastActivity = Date.now(); };
+    ['keydown', 'mousemove', 'mousedown', 'click', 'touchstart'].forEach(ev => window.addEventListener(ev, markActivity));
+
+
+    setInterval(() => {
+        isPlaying = (Date.now() - lastActivity) < idleTimeout;
+        timerDiv.style.opacity = isPlaying ? '1' : '0.5';
+    }, 500);
 
     function atualizarTimer() {
         min = Math.floor(tempo / 60);
         seg = tempo % 60;
+
         timerDiv.textContent = `${min.toString().padStart(2, '0')}:${seg.toString().padStart(2, '0')}`;
-        tempo++;
+
+        if (isPlaying) tempo++;
+
         setTimeout(atualizarTimer, 1000);
     }
-
     atualizarTimer();
+
 
     function salvarRecorde() {
         const atual = timerDiv.textContent;
@@ -338,19 +363,18 @@ window.onload = function() {
         const totalA = minA * 60 + segA;
         const totalB = minB * 60 + segB;
 
-        if (totalA > totalB) {
+        if (totalA > totalB)
             localStorage.setItem("melhorTempo", atual);
-        }
     }
 
-    function upInimigos(){
-        if(min > mininicial){
+    function upInimigos() {
+        if (min > mininicial) {
             vidamaxInimigo += 1;
             danoI += 1;
             velInimigo += 0.2;
             mininicial = min;
         }
-    }   
-    setInterval(upInimigos, 1000);
+    }
 
-}
+    setInterval(upInimigos, 1000);
+};
