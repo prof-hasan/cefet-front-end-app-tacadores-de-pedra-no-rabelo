@@ -1,4 +1,11 @@
 window.onload = function () {
+     // --- apenas conta tempo se o jogador estiver ativo ---
+    let isPlaying = true;
+    let lastActivity = Date.now();
+    const idleTimeout = 3000;
+    const markActivity = () => { lastActivity = Date.now(); };
+    ['keydown', 'mousemove', 'mousedown', 'click', 'touchstart'].forEach(ev => window.addEventListener(ev, markActivity));
+
     const personagem = document.getElementById("personagem");
     const tela = document.getElementById("tela");
 
@@ -162,28 +169,30 @@ window.onload = function () {
     function spawnInimigo() {
         const personagemPos = personagem.getBoundingClientRect();
 
-        let posXIn, posYIn;
-        const distanciaSegura = 200;
+        if (isPlaying) {
+            let posXIn, posYIn;
+            const distanciaSegura = 200;
 
-        do {
-            posXIn = Math.random() * (window.innerWidth - 40);
-            posYIn = Math.random() * (window.innerHeight - 40);
-        } while (
-            Math.abs(posYIn - personagemPos.top) < distanciaSegura ||
-            Math.abs(posXIn - personagemPos.left) < distanciaSegura
-        );
+            do {
+                posXIn = Math.random() * (window.innerWidth - 40);
+                posYIn = Math.random() * (window.innerHeight - 40);
+            } while (
+                Math.abs(posYIn - personagemPos.top) < distanciaSegura ||
+                Math.abs(posXIn - personagemPos.left) < distanciaSegura
+            );
 
-        const inimigo = document.createElement('div');
-        inimigo.className = 'inimigo';
-        inimigo.dataset.vida = vidamaxInimigo;
+            const inimigo = document.createElement('div');
+            inimigo.className = 'inimigo';
+            inimigo.dataset.vida = vidamaxInimigo;
 
-        inimigo.style.left = posXIn + 'px';
-        inimigo.style.top = posYIn + 'px';
-        inimigo.textContent = vidamaxInimigo;
+            inimigo.style.left = posXIn + 'px';
+            inimigo.style.top = posYIn + 'px';
+            inimigo.textContent = vidamaxInimigo;
 
-        tela.appendChild(inimigo);
+            tela.appendChild(inimigo);
+            intervalo = Math.max(intervaloMin, intervalo * reducao);
+        }
 
-        intervalo = Math.max(intervaloMin, intervalo * reducao);
         spawntime = setTimeout(spawnInimigo, intervalo);
     }
     spawnInimigo();
@@ -321,14 +330,6 @@ window.onload = function () {
     document.body.appendChild(timerDiv);
 
     let tempo = 0, mininicial = 0, min, seg;
-
-    // --- apenas conta tempo se o jogador estiver ativo ---
-    let isPlaying = true;
-    let lastActivity = Date.now();
-    const idleTimeout = 3000;
-    const markActivity = () => { lastActivity = Date.now(); };
-    ['keydown', 'mousemove', 'mousedown', 'click', 'touchstart'].forEach(ev => window.addEventListener(ev, markActivity));
-
 
     setInterval(() => {
         isPlaying = (Date.now() - lastActivity) < idleTimeout;
