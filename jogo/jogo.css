@@ -6,9 +6,10 @@
     height: 100vh;
     background: #222;
     overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    display: grid;
+    place-items: center;
+    grid-template-columns: repeat(25, 1fr);
+    grid-template-rows: repeat(20, 1fr);
 }
 
 #personagem {
@@ -49,4 +50,12 @@
     background: #ff0;
     border-radius: 50%;
     position: absolute;
+}
+
+.estrela {
+    width: 25px;
+    height: 25px;
+    background: #eee;
+    grid-column: 0;
+    grid-row: 0;
 }

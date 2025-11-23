@@ -1,19 +1,34 @@
-let estrelas = [];
 
+const tela = document.getElementById("tela");
 
 function Estrela() {
-    this.el = document.createElement('img');
-    this.el.src = 'https://img.freepik.com/vetores-premium/ilustracao-vetorial-isolada-do-icone-shine-star-black_34480-1056.jpg?semt=ais_incoming&w=740&q=80';
-    this.el.style.width = '40px';
-    this.el.style.position = 'fixed';
-    this.el = document.body.appendChild(this.el);
+    let posX = Math.round(24 * Math.random()), posY = Math.round(19 * Math.random());
+    let opacidade = 0;
+
+    let estrela = document.createElement('img');
+    estrela.className = 'estrela';
+    estrela.style.gridColumn = posX + ' / ' + (posX + 1);
+    estrela.style.gridRow = posY + ' / ' + (posY + 1);
+    estrela.style.opacity = 0;
+    tela.appendChild(estrela);
+
+    let fadeIn = setInterval(() => {
+        opacidade += 0.1;
+        estrela.style.opacity = opacidade;
+        if(opacidade >= 1) {
+            clearInterval(fadeIn);
+            setTimeout(() => {
+                let fadeOut = setInterval(() => {
+                    opacidade -= 0.1;
+                    estrela.style.opacity = opacidade;
+                    if(opacidade <= 0) {
+                        clearInterval(fadeOut);
+                        tela.removeChild(estrela);
+                    }
+                }, 200);
+            }, 2000);
+        }
+    }, 200);
 }
 
-Estrela.prototype.remove = function() {
-    document.body.removeChild(this.el);
-};
-
-Estrela.prototype.posicao = function(tempoDeInicio){
-    this.x = Math.random() * window.innerWidth;
-    this.y = Math.random() * window.innerHeight;
-}
+setInterval(Estrela, 1500);
