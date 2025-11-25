@@ -1,3 +1,7 @@
+*{
+    user-select: none;
+}
+
 #tela {
     position: fixed;
     top: 0;
@@ -24,8 +28,6 @@
     justify-content: center;
     font-family: Arial, sans-serif;
     color: white;
-    user-select: none;
-    -webkit-user-select: none;
 }
 
 .inimigo {
@@ -40,14 +42,12 @@
     color: #eee;
     font-family: Arial, sans-serif;
     font-size: 18px;
-    user-select: none;
-    -webkit-user-select: none;
+
 }
 
 .tiro {
-    width: 10px;
-    height: 10px;
-    background: #ff0;
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
     position: absolute;
 }

@@ -229,7 +229,8 @@ window.onload = function () {
         if (!podeAtirar) return;
         podeAtirar = false;
 
-        const tiro = document.createElement('div');
+        const tiro = document.createElement('img');
+        tiro.src = '../assets/tiro.png';
         tiro.className = 'tiro';
 
         let tiroX = posX + 20;
@@ -245,6 +246,11 @@ window.onload = function () {
         const dist = Math.sqrt(dx * dx + dy * dy);
         dx /= dist;
         dy /= dist;
+
+        if (dx !== 0 || dy !== 0) {
+            const ang = Math.atan2(dy, dx) * 180 / Math.PI;
+            tiro.style.transform = `rotate(${ang + 90}deg)`;
+        }
 
         const velTiro = 8;
         let perfTiro = perf;
