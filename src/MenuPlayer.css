@@ -66,3 +66,15 @@ main{
   margin: 2rem 0 1rem 0;
 }
 
+.topGlobal {
+  margin-top: 20px;
+
+}
+
+.nome {
+  border-radius: 5px;
+}
+
+.nomeSumiu {
+  display: none;
+}

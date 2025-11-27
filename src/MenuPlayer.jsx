@@ -71,12 +71,18 @@ function MenuPlayer() {
     window.location.href = 'jogo/jogo.html';
   };
 
+  const top = () => {
+    window.location.href = 'jogo/topGlobal.html';
+  };
+
   return (
     <>
       <main>
         <section className="menu">
           <h1>Menu de Upgrades</h1>
           <p>💰 Dinheiro: ${playerMoney}</p>
+
+          <input type="text" className='nome' placeholder='Digite seu nome:'/>
 
           <section className='upgrades'>
             {upgrades.map((upgrade) => {
@@ -118,7 +124,12 @@ function MenuPlayer() {
               Jogar
             </button>
           </div>
+
+          <div className='topGlobal'>
+            <button id="start-btn" onClick={top} className="btn btn-outline-success"> Top Global</button>
+          </div>
         </section>
+
       </main>
     </>
   );

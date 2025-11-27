@@ -385,3 +385,10 @@ window.onload = function () {
 
     setInterval(upInimigos, 1000);
 };
+
+let nomeInput = document.querySelector(".nome");
+
+let nomeDoInput;
+nomeInput.addEventListener("change", () => {
+    nomeDoInput = nomeInput.value;
+});
