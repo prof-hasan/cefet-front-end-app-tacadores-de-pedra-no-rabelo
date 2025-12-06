@@ -7,12 +7,20 @@
     <link rel="stylesheet" href="/src/top.css">
 </head>
 <body>
-    <h1>Top Global Atual</h1>
-    
-    <div class="lideres">
-        
-    </div>
+    <header class="top-header">
+        <button class="back-btn" onclick="window.location.href = '../index.html'" aria-label="Voltar">← Voltar</button>
+        <h1>Top Global Atual</h1>
+    </header>
 
-    <script src="./server.js"></script>
+    <main class="content">
+        <div class="lideres"></div>
+
+        <div class="send-score">
+            <input id="topNome" type="text" placeholder="Digite Seu nome" />
+            <button id="sendTop">Enviar meu tempo</button>
+        </div>
+    </main>
+
+    <script src="/server.js"></script>
 </body>
 </html>

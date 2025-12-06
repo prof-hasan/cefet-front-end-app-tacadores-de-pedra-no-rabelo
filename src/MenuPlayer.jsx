@@ -82,8 +82,6 @@ function MenuPlayer() {
           <h1>Menu de Upgrades</h1>
           <p>💰 Dinheiro: ${playerMoney}</p>
 
-          <input type="text" className='nome' placeholder='Digite seu nome:'/>
-
           <section className='upgrades'>
             {upgrades.map((upgrade) => {
               const nivel = nivelUpgrades[upgrade.nome] || 0;
