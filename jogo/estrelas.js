@@ -5,7 +5,7 @@ function Estrela() {
     let posX = Math.round(24 * Math.random()), posY = Math.round(19 * Math.random());
     let opacidade = 0;
 
-    let estrela = document.createElement('img');
+    let estrela = document.createElement('div');
     estrela.className = 'estrela';
     estrela.style.gridColumn = posX + ' / ' + (posX + 1);
     estrela.style.gridRow = posY + ' / ' + (posY + 1);

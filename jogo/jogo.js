@@ -112,6 +112,9 @@ window.onload = function () {
 
                 if (vida <= 0) {
                     vida = 0;
+                    try { clearTimeout(spawntime); } catch (e) { }
+                    const todos = document.querySelectorAll('.inimigo');
+                    todos.forEach(i => i.remove());
                     salvarRecorde();
                     setTimeout(() => {
                         window.location.href = "../index.html";
@@ -215,6 +218,9 @@ window.onload = function () {
 
                 inimigoX += dx * velInimigo;
                 inimigoY += dy * velInimigo;
+
+                const ang = Math.atan2(dy, dx) * 180 / Math.PI;
+                inimigo.style.transform = `rotate(${ang + 90}deg)`;
 
                 inimigo.style.left = inimigoX + 'px';
                 inimigo.style.top = inimigoY + 'px';
