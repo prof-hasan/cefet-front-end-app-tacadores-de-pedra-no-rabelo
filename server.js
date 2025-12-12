@@ -1,185 +1,203 @@
-
-function parseTimeToSeconds(t) {
+function converterTempoParaSegundos(t) {
     if (!t) return 0;
     if (typeof t === 'number') return Math.floor(t);
     if (typeof t !== 'string') return 0;
+
     if (t.includes(':')) {
-        const [mStr, sStr] = t.split(':');
-        const m = parseInt(mStr, 10) || 0;
-        const s = parseInt(sStr, 10) || 0;
-        return m * 60 + s;
+        const [minStr, segStr] = t.split(':');
+        const minutos = parseInt(minStr, 10) || 0;
+        const segundos = parseInt(segStr, 10) || 0;
+        return minutos * 60 + segundos;
     }
-    const n = parseInt(t, 10);
-    return isNaN(n) ? 0 : n;
+    const numero = parseInt(t, 10);
+    return isNaN(numero) ? 0 : numero;
 }
 
-function formatSecondsToTime(secs) {
-    const s = Number(secs) || 0;
-    const m = Math.floor(s / 60);
-    const sec = s % 60;
-    return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+function formatarSegundosParaTempo(segundos) {
+    const total = Number(segundos) || 0;
+    const minutos = Math.floor(total / 60);
+    const seg = total % 60;
+    return `${String(minutos).padStart(2, '0')}:${String(seg).padStart(2, '0')}`;
 }
 
-function getLocalRecord() {
-    const melhorTempo = localStorage.getItem('melhorTempo');
-    const melhorSeg = localStorage.getItem('melhorTempoSeconds');
-    const nome = localStorage.getItem('topNome') || localStorage.getItem('lastTopName') || null;
-    const deviceId = localStorage.getItem('deviceId') || null;
-    if (!melhorTempo && !melhorSeg) return null;
-    const points = melhorSeg ? parseInt(melhorSeg, 10) || 0 : parseTimeToSeconds(melhorTempo);
-    return { name: nome || 'Você', points: points, deviceId };
+function pegarRecordeLocal() {
+    const melhorTexto = localStorage.getItem('melhorTempo');
+    const melhorSeg = localStorage.getItem('melhorTempoSegundos');
+    const nome = localStorage.getItem('topNome') || localStorage.getItem('ultimoNomeTop') || 'Você';
+    const dispositivoId = localStorage.getItem('dispositivoId') || null;
+
+    if (!melhorTexto && !melhorSeg) return null;
+
+    const pontos = melhorSeg
+        ? parseInt(melhorSeg, 10) || 0
+        : converterTempoParaSegundos(melhorTexto);
+
+    return { nome, pontos, dispositivoId };
 }
+
+const API_URL = "https://jogodenave-10d2.restdb.io/rest/score";
+const API_HEADER = {
+    "content-type": "application/json",
+    "x-apikey": "691e2a001c64b94228dde39c"
+};
 
 async function enviarPontuacao(nome, pontos) {
     try {
-        const res = await fetch("https://jogodenave-10d2.restdb.io/rest/score", {
+        const resposta = await fetch(API_URL, {
             method: "POST",
-            headers: { "content-type": "application/json", "x-apikey": "691e2a001c64b94228dde39c" },
+            headers: API_HEADER,
             body: JSON.stringify({ name: nome, points: pontos })
         });
-
-            const data = await res.json();
-            console.log("score enviado!", data);
-            return data;
-    } catch (err) {
-        console.error('Erro ao enviar pontuação', err);
-        throw err;
+        return await resposta.json();
+    } catch (erro) {
+        console.error("Erro ao enviar pontuação:", erro);
+        throw erro;
     }
 }
 
 async function enviarMelhorTempo() {
-    const nomeEl = document.getElementById("topNome");
-    if (!nomeEl) return console.warn('Elemento #topNome não encontrado');
-    const nome = nomeEl.value && nomeEl.value.trim();
-    if (!nome) return alert('Digite um nome antes de enviar.');
+    const campoNome = document.getElementById("topNome");
+    if (!campoNome) return alert("Erro: Campo de nome não encontrado.");
 
-    const melhorTempo = localStorage.getItem("melhorTempo");
-    if (!melhorTempo) {
-        return alert('Nenhum tempo salvo para enviar.');
+    const nome = campoNome.value.trim();
+    if (!nome) return alert("Digite um nome antes de enviar.");
+
+    const tempoTexto = localStorage.getItem("melhorTempo");
+    if (!tempoTexto) return alert("Nenhum tempo salvo para enviar.");
+
+    const tempoSegundos = converterTempoParaSegundos(tempoTexto);
+
+    let dispositivoId = localStorage.getItem('dispositivoId');
+    if (!dispositivoId) {
+        dispositivoId = "dev-" + Math.random().toString(36).slice(2, 10);
+        localStorage.setItem('dispositivoId', dispositivoId);
     }
 
-    const segundos = parseTimeToSeconds(melhorTempo);
-        let deviceId = localStorage.getItem('deviceId');
-        if (!deviceId) {
-            deviceId = 'dev-' + Math.random().toString(36).slice(2, 10);
-            localStorage.setItem('deviceId', deviceId);
-        }
+    try {
+        const filtro = encodeURIComponent(JSON.stringify({
+            "$or": [{ deviceId: dispositivoId }, { name: nome }]
+        }));
 
-        try {
-           const q = { "$or": [{ deviceId }, { name: nome }] };
-            const query = encodeURIComponent(JSON.stringify(q));
-            const urlQuery = `https://jogodenave-10d2.restdb.io/rest/score?q=${query}`;
-            const resp = await fetch(urlQuery, { headers: { "content-type": "application/json", "x-apikey": "691e2a001c64b94228dde39c" } });
-            const existing = await resp.json();
+        const buscaURL = `${API_URL}?q=${filtro}`;
+        const resposta = await fetch(buscaURL, { headers: API_HEADER });
+        const registros = await resposta.json();
 
-            if (existing && existing.length > 0) {
-               existing.sort((a, b) => (b.points || 0) - (a.points || 0));
-                const best = existing[0];
+        if (registros.length > 0) {
+            registros.sort((a, b) => (b.points || 0) - (a.points || 0));
+            const melhorRegistro = registros[0];
 
-               for (let i = 1; i < existing.length; i++) {
-                    const toDel = existing[i];
-                    (async () => {
-                        try {
-                            await fetch(`https://jogodenave-10d2.restdb.io/rest/score/${toDel._id}`, {
-                                method: 'DELETE',
-                                headers: { "content-type": "application/json", "x-apikey": "691e2a001c64b94228dde39c" }
-                            });
-                        } catch (e) {
-                            console.warn('Falha ao deletar duplicata', e);
-                        }
-                    })();
-                }
-
-               if (segundos > (best.points || 0)) {
-                    const putUrl = `https://jogodenave-10d2.restdb.io/rest/score/${best._id}`;
-                    await fetch(putUrl, {
-                        method: 'PUT',
-                        headers: { "content-type": "application/json", "x-apikey": "691e2a001c64b94228dde39c" },
-                        body: JSON.stringify({ name: nome, points: segundos, deviceId })
+            for (let i = 1; i < registros.length; i++) {
+                try {
+                    await fetch(`${API_URL}/${registros[i]._id}`, {
+                        method: "DELETE",
+                        headers: API_HEADER
                     });
-                    try { localStorage.setItem('melhorTempo', formatSecondsToTime(segundos)); } catch(e){}
-                    try { localStorage.setItem('melhorTempoSeconds', String(segundos)); } catch(e){}
-                    try { localStorage.setItem('topNome', nome); } catch(e){}
-                    alert('Tempo atualizado com sucesso!');
-                } else {
-                    alert('Você já tem um tempo igual ou melhor salvo neste dispositivo.');
-                }
-            } else {
-
-                await fetch("https://jogodenave-10d2.restdb.io/rest/score", {
-                    method: "POST",
-                    headers: { "content-type": "application/json", "x-apikey": "691e2a001c64b94228dde39c" },
-                    body: JSON.stringify({ name: nome, points: segundos, deviceId })
-                });
-                try { localStorage.setItem('melhorTempo', formatSecondsToTime(segundos)); } catch(e){}
-                try { localStorage.setItem('melhorTempoSeconds', String(segundos)); } catch(e){}
-                try { localStorage.setItem('topNome', nome); } catch(e){}
-                alert('Tempo enviado com sucesso!');
+                } catch (err) {}
             }
-        } catch (err) {
-            console.error('Erro ao enviar/atualizar pontuação', err);
-            alert('Erro ao enviar pontuação. Veja console para detalhes.');
+
+            if (tempoSegundos > (melhorRegistro.points || 0)) {
+                await fetch(`${API_URL}/${melhorRegistro._id}`, {
+                    method: "PUT",
+                    headers: API_HEADER,
+                    body: JSON.stringify({
+                        name: nome,
+                        points: tempoSegundos,
+                        deviceId: dispositivoId
+                    })
+                });
+
+                localStorage.setItem('melhorTempo', formatarSegundosParaTempo(tempoSegundos));
+                localStorage.setItem('melhorTempoSegundos', tempoSegundos);
+                localStorage.setItem('topNome', nome);
+
+                alert("Tempo atualizado com sucesso!");
+            } else {
+                alert("Você já possui um tempo igual ou melhor salvo.");
+            }
+        } else {
+            await fetch(API_URL, {
+                method: "POST",
+                headers: API_HEADER,
+                body: JSON.stringify({
+                    name: nome,
+                    points: tempoSegundos,
+                    deviceId: dispositivoId
+                })
+            });
+
+            localStorage.setItem('melhorTempo', formatarSegundosParaTempo(tempoSegundos));
+            localStorage.setItem('melhorTempoSegundos', tempoSegundos);
+            localStorage.setItem('topNome', nome);
+
+            alert("Tempo enviado com sucesso!");
         }
 
-    atualizarTopGlobal();
+        atualizarRankingGlobal();
+
+    } catch (erro) {
+        console.error("Erro ao enviar/atualizar tempo:", erro);
+        alert("Erro ao enviar pontuação.");
+    }
 }
 
-async function pegarTopLeader() {
+async function pegarRanking() {
     try {
-            const url = 'https://jogodenave-10d2.restdb.io/rest/score?q={}&h={"$orderby":{"points":-1},"$limit":100}';
-        const res = await fetch(url, { headers: { "content-type": "application/json", "x-apikey": "691e2a001c64b94228dde39c" } });
-        if (!res.ok) throw new Error('Erro ao buscar leaderboard: ' + res.status);
+        const url = API_URL + '?q={}&h={"$orderby":{"points":-1},"$limit":100}';
+        const res = await fetch(url, { headers: API_HEADER });
         return await res.json();
     } catch (err) {
-        console.error(err);
+        console.error("Erro ao buscar ranking:", err);
         return [];
     }
 }
 
-async function atualizarTopGlobal() {
-    const scores = await pegarTopLeader();
+async function atualizarRankingGlobal() {
     const lista = document.querySelector(".lideres");
     if (!lista) return;
+
     lista.innerHTML = "";
 
-    const unique = {};
-    const filtered = [];
-    for (const s of scores) {
-        const id = s.deviceId || s.name;
-        if (!unique[id]) {
-            unique[id] = true;
-            filtered.push(s);
+    const ranking = await pegarRanking();
+
+    const unico = {};
+    const filtrado = [];
+
+    for (const dado of ranking) {
+        const id = dado.deviceId || dado.name;
+        if (!unico[id]) {
+            unico[id] = true;
+            filtrado.push(dado);
         }
     }
 
-    const localRec = getLocalRecord();
-    if (localRec) {
-        const localId = localRec.deviceId || localRec.name;
-        if (!unique[localId]) {
-            let inserted = false;
-            for (let i = 0; i < filtered.length; i++) {
-                if ((localRec.points || 0) > (filtered[i].points || 0)) {
-                    filtered.splice(i, 0, localRec);
-                    inserted = true;
+    const local = pegarRecordeLocal();
+    if (local) {
+        const idLocal = local.dispositivoId || local.nome;
+        if (!unico[idLocal]) {
+            let inserido = false;
+            for (let i = 0; i < filtrado.length; i++) {
+                if ((local.pontos || 0) > (filtrado[i].points || 0)) {
+                    filtrado.splice(i, 0, local);
+                    inserido = true;
                     break;
                 }
             }
-            if (!inserted) filtered.push(localRec);
+            if (!inserido) filtrado.push(local);
         }
     }
 
-    //limite de 5 entradas
-    const topList = filtered.slice(0, 5);
-    topList.forEach((s, i) => {
-        const time = formatSecondsToTime(s.points);
-        const li = document.createElement('li');
-        li.textContent = `${i+1}. ${s.name} — ${time}`;
+    const top5 = filtrado.slice(0, 5);
+
+    top5.forEach((item, indice) => {
+        const tempo = formatarSegundosParaTempo(item.points);
+        const li = document.createElement("li");
+        li.textContent = `${indice + 1}. ${item.name || item.nome} — ${tempo}`;
         lista.appendChild(li);
     });
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    atualizarTopGlobal();
-    const btn = document.getElementById('sendTop');
-    if (btn) btn.addEventListener('click', enviarMelhorTempo);
+    atualizarRankingGlobal();
+    const botao = document.getElementById("sendTop");
+    if (botao) botao.addEventListener("click", enviarMelhorTempo);
 });

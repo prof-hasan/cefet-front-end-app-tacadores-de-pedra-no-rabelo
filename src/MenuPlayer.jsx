@@ -75,6 +75,10 @@ function MenuPlayer() {
     window.location.href = 'jogo/topGlobal.html';
   };
 
+  const grupo = () => {
+    window.location.href = 'meu grupo/meuGrupo.html';
+  }
+
   return (
     <>
       <main>
@@ -125,6 +129,10 @@ function MenuPlayer() {
 
           <div className='topGlobal'>
             <button id="start-btn" onClick={top} className="btn btn-outline-success"> Top Global</button>
+          </div>
+
+          <div className='meuGrupo'>
+            <button id='start-btn' onClick={grupo} className="btn btn-outline-success">Meu Grupo</button>
           </div>
         </section>
 

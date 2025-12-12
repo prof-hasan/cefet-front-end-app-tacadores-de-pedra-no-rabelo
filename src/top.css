@@ -174,5 +174,15 @@ h1 {
     font-weight: 700;
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
-.back-btn:hover{ transform: translateY(-52%); }
-.content{ width:100%; max-width:560px; margin: 0 auto; display:flex; flex-direction:column; align-items:center; padding-top:72px; }
+.back-btn:hover{
+     transform: translateY(-52%); 
+    }
+.content{ 
+    width:100%;
+    max-width:560px; 
+    margin: 0 auto; 
+    display:flex; 
+    flex-direction:column; 
+    align-items:center; 
+    padding-top:72px; 
+}
